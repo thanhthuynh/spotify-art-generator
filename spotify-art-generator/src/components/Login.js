@@ -1,10 +1,18 @@
-import React from "react";
-import { authEndpoint, clientId, redirectUri, scopes } from "../spotify";
+import React, { useEffect } from "react";
+import {
+  getLoginUrlWithPkce,
+  generateCodeVerifier,
+  generateCodeChallenge,
+} from "../spotify";
 
 const Login = () => {
-  const loginUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
-    "%20"
-  )}&response_type=token&show_dialog=true`;
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = generateCodeChallenge(codeVerifier);
+  const loginUrl = getLoginUrlWithPkce(codeChallenge);
+
+  useEffect(() => {
+    localStorage.setItem("code_verifier", codeVerifier);
+  }, []);
 
   return (
     <div className="login">
