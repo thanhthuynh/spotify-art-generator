@@ -96,7 +96,6 @@ const SelectedPlaylistPage = () => {
 
           <button onClick={handleDALLEGenerateImage}>Generate Sentiment Image with Open AI</button>
           {result && <img className="result-image" src={result} alt="DALL-E Sentiment" />}
-
         </>
       )}
     </div>

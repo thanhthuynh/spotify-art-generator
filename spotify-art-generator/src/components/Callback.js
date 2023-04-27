@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Callback.css';
+import '../styles/styles.css';
 
 
 const Callback = () => {

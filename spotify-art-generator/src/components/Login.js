@@ -1,25 +1,24 @@
-import React, { useEffect } from "react";
-import {
-  getLoginUrlWithPkce,
-  generateCodeVerifier,
-  generateCodeChallenge,
-} from "../spotify";
+import React from 'react';
 
 const Login = () => {
-  const codeVerifier = generateCodeVerifier();
-  const codeChallenge = generateCodeChallenge(codeVerifier);
-  const loginUrl = getLoginUrlWithPkce(codeChallenge);
+  const clientId = '7bcd29159d7d4a8990c1048b8c08a19a';
+  const redirectUri = 'http://localhost:3000/callback';
 
-  useEffect(() => {
-    localStorage.setItem("code_verifier", codeVerifier);
-  }, []);
+  const handleLogin = () => {
+    const authEndpoint = 'https://accounts.spotify.com/authorize';
+    const responseType = 'token';
+    const scope = 'playlist-read-private';
+
+    const url = `${authEndpoint}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${encodeURIComponent(scope)}`;
+
+    window.location.href = url;
+  };
 
   return (
     <div className="login">
-      <h1>Login with Spotify</h1>
-      <a href={loginUrl} className="login__button">
-        Login
-      </a>
+      <button className="login-button" onClick={handleLogin}>
+        Login with Spotify
+      </button>
     </div>
   );
 };

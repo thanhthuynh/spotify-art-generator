@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PlaylistList from './PlaylistList';
 import Logout from './Logout';
-import '../styles/Dashboard.css';
+import '../styles/styles.css';
 import evaluateSentiment from './evaluateSentiment';
 
 
