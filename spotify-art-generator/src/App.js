@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Callback from './components/Callback';
 import Dashboard from './components/Dashboard';
+import SelectedPlaylistPage from './components/SelectedPlaylistPage';
 import './App.css';
 
 
@@ -28,6 +29,7 @@ const App = () => {
       <Routes>
         <Route path="/callback" element={<Callback />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/selected-playlist/:id" element={<SelectedPlaylistPage />} />
       </Routes>
     </div>
   );

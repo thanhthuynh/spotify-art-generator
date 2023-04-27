@@ -1,30 +1,15 @@
 import React, { useEffect, useState } from 'react';
-//import cloudinary from './utils/cloudinary';
+import { useNavigate } from 'react-router-dom';
+import PlaylistList from './PlaylistList';
+import Logout from './Logout';
 import '../styles/Dashboard.css';
+import evaluateSentiment from './evaluateSentiment';
 
-function evaluateSentiment(audioFeatures) {
-  const numTracks = audioFeatures.length;
-  const totalValence = audioFeatures.reduce((sum, track) => sum + track.valence, 0);
-  const totalEnergy = audioFeatures.reduce((sum, track) => sum + track.energy, 0);
-  const totalDanceability = audioFeatures.reduce((sum, track) => sum + track.danceability, 0);
-
-  const avgValence = totalValence / numTracks;
-  const avgEnergy = totalEnergy / numTracks;
-  const avgDanceability = totalDanceability / numTracks;
-
-  const sentimentScore = (avgValence + avgEnergy + avgDanceability) / 3;
-
-  if (sentimentScore >= 0.6) {
-    return 'positive';
-  } else if (sentimentScore >= 0.4) {
-    return 'neutral';
-  } else {
-    return 'negative';
-  }
-}
 
 const Dashboard = () => {
   const [playlists, setPlaylists] = useState([]);
+  // const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('spotify_access_token');
@@ -67,25 +52,22 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  const handleSelectPlaylist = (playlist) => {
+    navigate(`/selected-playlist/${playlist.id}`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('spotify_access_token');
+    navigate('/'); // Navigate back to the login page
+  };
+
   return (
     <div className="dashboard-container">
       <h1>Your Playlists</h1>
-      <ul className="playlist-list">
-        {playlists.map((playlist) => (
-          <li key={playlist.id}>
-            <h3>{playlist.name}</h3>
-            <p>Sentiment: {playlist.sentiment}</p>
-            <ul>
-              {playlist.tracksData &&
-                playlist.tracksData.map((trackItem) => (
-                  <li key={trackItem.track.id}>{trackItem.track.name}</li>
-                ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
+      <Logout onLogout={handleLogout} />
+      <PlaylistList playlists={playlists} onSelectPlaylist={handleSelectPlaylist} />
     </div>
-    );
+  );
 };
 
 export default Dashboard;
