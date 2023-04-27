@@ -7,6 +7,10 @@ import evaluateSentiment from './evaluateSentiment';
 
 
 const Dashboard = () => {
+
+  const [displayName, setDisplayName] = useState('');
+
+
   const [playlists, setPlaylists] = useState([]);
   // const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const navigate = useNavigate();
@@ -47,6 +51,14 @@ const Dashboard = () => {
       }
 
       setPlaylists([...firstFivePlaylists]);
+
+      const userProfileResponse = await fetch('https://api.spotify.com/v1/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const userProfileData = await userProfileResponse.json();
+      setDisplayName(userProfileData.display_name);
+
     };
 
     fetchData();
@@ -63,11 +75,14 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <h1>Your Playlists</h1>
-      <Logout onLogout={handleLogout} />
+      <div className="dashboard-header">
+        <h1>{displayName}'s Playlists</h1>
+        <Logout onLogout={handleLogout} />
+      </div>
       <PlaylistList playlists={playlists} onSelectPlaylist={handleSelectPlaylist} />
     </div>
   );
+
 };
 
 export default Dashboard;

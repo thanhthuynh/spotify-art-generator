@@ -5,81 +5,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #121212;
+  color: #ffffff;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
-}
-
-
-
-/* Additional styles that I added below */
-
-.login {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #1db954;
-}
-
-.login h1 {
-  color: white;
-  font-size: 3rem;
-  margin-bottom: 2rem;
-}
-
-.login__button {
-  display: inline-block;
-  background-color: white;
-  color: #1db954;
-  font-weight: 700;
-  text-decoration: none;
-  padding: 1rem 2rem;
-  border-radius: 50px;
-  font-size: 1.2rem;
-  transition: background-color 0.3s;
-}
-
-.login__button:hover {
-  background-color: rgba(255, 255, 255, 0.8);
-}
-
-/* Add these styles at the end of the file */
-
-.playlists {
-  padding: 2rem;
-}
-
-.playlists__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-gap: 1rem;
-}
-
-.playlist {
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 4px;
-}
-
-.playlist h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-
-.playlist button {
-  background-color: #1db954;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.playlist button:hover {
-  background-color: #1ed760;
 }
