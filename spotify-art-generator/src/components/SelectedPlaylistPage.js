@@ -1,49 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import evaluateSentiment from './evaluateSentiment';
+import { useNavigate } from 'react-router-dom';
 import openai from '../utils/openAI';
 import '../styles/styles.css';
+import { ThreeDots } from 'react-loader-spinner';
+
 
 const SelectedPlaylistPage = () => {
-    const [playlist, setPlaylist] = useState(null);
-    const [sentimentImageUrl, setSentimentImageUrl] = useState(null);
-    const { id } = useParams();
+  const [playlist, setPlaylist] = useState(null);
+  const [sentimentImageUrl, setSentimentImageUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
-        const accessToken = localStorage.getItem('spotify_access_token');
-        if (!accessToken) {
-          return;
-        }
-      
-        // Fetch the playlist data by its ID
-        const response = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const playlist = await response.json();
-      
-        // Fetch the playlist tracks
-        const trackResponse = await fetch(playlist.tracks.href, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const trackData = await trackResponse.json();
-        const tracks = trackData.items.slice(0, 5);
-        playlist.tracksData = tracks;
-      
-        // Fetch the audio features for the tracks
-        const trackIds = tracks.map((trackItem) => trackItem.track.id).join(',');
-        const audioFeaturesResponse = await fetch(`https://api.spotify.com/v1/audio-features?ids=${trackIds}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const audioFeaturesData = await audioFeaturesResponse.json();
-      
-        // Evaluate the sentiment based on audio features
-        const sentiment = evaluateSentiment(audioFeaturesData.audio_features);
-        playlist.sentiment = sentiment;
-      
-        setPlaylist(playlist);
-      };      
-    
+      setIsLoading(true);
+      const accessToken = localStorage.getItem('spotify_access_token');
+      if (!accessToken) {
+        return;
+      }
+
+      // Fetch the playlist data by its ID
+      const response = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const playlist = await response.json();
+
+      // Fetch the playlist tracks
+      const trackResponse = await fetch(playlist.tracks.href, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const trackData = await trackResponse.json();
+      const tracks = trackData.items.slice(0, 5);
+      playlist.tracksData = tracks;
+
+      // Fetch the audio features for the tracks
+      const trackIds = tracks.map((trackItem) => trackItem.track.id).join(',');
+      const audioFeaturesResponse = await fetch(`https://api.spotify.com/v1/audio-features?ids=${trackIds}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const audioFeaturesData = await audioFeaturesResponse.json();
+
+      // Evaluate the sentiment based on audio features
+      const sentiment = evaluateSentiment(audioFeaturesData.audio_features);
+      playlist.sentiment = sentiment;
+
+      setPlaylist(playlist);
+      setIsLoading(false);
+    };
+
     fetchData();
   }, [id]);
 
@@ -62,9 +68,9 @@ const SelectedPlaylistPage = () => {
   const handleDALLEGenerateImage = async () => {
     try {
       const response = await openai.createImage({
-        prompt: 'Create a 1024x1024 image that conveys ' + playlist.sentiment,
+        prompt: 'Create an image that conveys the feeling of' + playlist.sentiment,
         n: 1,
-        size: '1024x1024',
+        size: '512x512',
       });
   
       console.log(response.data.data[0].url);
@@ -83,20 +89,46 @@ const SelectedPlaylistPage = () => {
       }
     }
   };
+
+  const navigate = useNavigate();
+
+  const handleBackToDashboard = () => {
+    navigate('/dashboard');
+  };
   
 
   return (
     <div className="selected-playlist-page">
-      {playlist && (
-        <>
-          <h1>{playlist.name}</h1>
-          <p>Sentiment: {playlist.sentiment}</p>
-          <button onClick={() => handleCloudinaryGenerateImage(playlist.sentiment)}>Generate Sentiment Image with Cloudinary</button>
-          {sentimentImageUrl && <img src={sentimentImageUrl} alt="Cloudinary Sentiment" />}
+      <button className="back-to-dashboard" onClick={handleBackToDashboard}>
+        Back to Dashboard
+      </button>
+      {isLoading ? (
+        <ThreeDots 
+        height="80" 
+        width="80" 
+        radius="9"
+        color="#4fa94d" 
+        ariaLabel="three-dots-loading"
+        wrapperStyle={{}}
+        wrapperClassName=""
+        visible={true}
+         />
+      ) : (
+        playlist && (
+          <>
+            <h1>{playlist.name}</h1>
+            <p>Sentiment: {playlist.sentiment}</p>
+            <button onClick={() => handleCloudinaryGenerateImage(playlist.sentiment)}>
+              Generate Sentiment Image with Cloudinary
+            </button>
+            {sentimentImageUrl && <img src={sentimentImageUrl} alt="Cloudinary Sentiment" />}
 
-          <button onClick={handleDALLEGenerateImage}>Generate Sentiment Image with Open AI</button>
-          {result && <img className="result-image" src={result} alt="DALL-E Sentiment" />}
-        </>
+            <button onClick={handleDALLEGenerateImage}>
+              Generate Sentiment Image with Open AI
+            </button>
+            {result && <img className="result-image" src={result} alt="DALL-E Sentiment" />}
+          </>
+        )
       )}
     </div>
   );

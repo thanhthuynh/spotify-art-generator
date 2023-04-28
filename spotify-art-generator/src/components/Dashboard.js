@@ -4,15 +4,13 @@ import PlaylistList from './PlaylistList';
 import Logout from './Logout';
 import '../styles/styles.css';
 import evaluateSentiment from './evaluateSentiment';
+import { ThreeDots } from 'react-loader-spinner';
 
 
 const Dashboard = () => {
-
+  const [isLoading, setIsLoading] = useState(false);
   const [displayName, setDisplayName] = useState('');
-
-
   const [playlists, setPlaylists] = useState([]);
-  // const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +20,7 @@ const Dashboard = () => {
     }
 
     const fetchData = async () => {
+      setIsLoading(true);
       const response = await fetch('https://api.spotify.com/v1/me/playlists', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -47,7 +46,6 @@ const Dashboard = () => {
         // Evaluate the sentiment based on audio features
         const sentiment = evaluateSentiment(audioFeaturesData.audio_features);
         playlist.sentiment = sentiment;
-
       }
 
       setPlaylists([...firstFivePlaylists]);
@@ -59,6 +57,7 @@ const Dashboard = () => {
       const userProfileData = await userProfileResponse.json();
       setDisplayName(userProfileData.display_name);
 
+      setIsLoading(false);
     };
 
     fetchData();
@@ -74,15 +73,33 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>{displayName}'s Playlists</h1>
-        <Logout onLogout={handleLogout} />
-      </div>
-      <PlaylistList playlists={playlists} onSelectPlaylist={handleSelectPlaylist} />
-    </div>
+    <>
+      {isLoading ? (
+        <div className="loader-wrapper">
+          <ThreeDots 
+            height="80" 
+            width="80" 
+            radius="9"
+            color="#4fa94d" 
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            wrapperClassName=""
+            visible={true}
+          />
+        </div>
+      ) : (
+        <>
+        <div className="dashboard-container">
+          <div className="dashboard-header">
+            <h1>{displayName}'s Playlists</h1>
+            <Logout onLogout={handleLogout} />
+          </div>
+          <PlaylistList playlists={playlists} onSelectPlaylist={handleSelectPlaylist} />
+        </div>
+        </>
+      )}
+    </>
   );
-
 };
 
 export default Dashboard;

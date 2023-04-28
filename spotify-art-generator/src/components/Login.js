@@ -15,10 +15,12 @@ const Login = () => {
   };
 
   return (
-    <div className="login">
+    <div className="login-container">
+      <h1> Spotify Playlist AI Art Generator</h1>
       <button className="login-button" onClick={handleLogin}>
         Login with Spotify
       </button>
+      <footer>Developed by Thanh Huynh, Caden Huffman, and Jung (Jenny) Youjung</footer>
     </div>
   );
 };
