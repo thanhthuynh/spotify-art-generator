@@ -5,7 +5,7 @@ const SelectedPlaylist = ({ playlist }) => (
     <h2>Selected Playlist</h2>
     <h3>{playlist.name}</h3>
     <img src={playlist.imageUrl} alt={`${playlist.name} cover`} />
-    <p>Sentiment: {playlist.sentiment}</p>
+    <p>Sentiment: {playlist.mood} {playlist.genre}</p>
   </div>
 );
 

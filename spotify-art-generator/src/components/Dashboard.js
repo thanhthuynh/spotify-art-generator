@@ -6,11 +6,11 @@ import '../styles/styles.css';
 import evaluateSentiment from './evaluateSentiment';
 import { ThreeDots } from 'react-loader-spinner';
 
-
 const Dashboard = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [displayName, setDisplayName] = useState('');
   const [playlists, setPlaylists] = useState([]);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,45 +20,55 @@ const Dashboard = () => {
     }
 
     const fetchData = async () => {
-      setIsLoading(true);
-      const response = await fetch('https://api.spotify.com/v1/me/playlists', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      const data = await response.json();
-      const firstFivePlaylists = data.items.slice(0, 5);
-
-      for (const playlist of firstFivePlaylists) {
-        // Fetch the playlist tracks
-        const trackResponse = await fetch(playlist.tracks.href, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const trackData = await trackResponse.json();
-        const tracks = trackData.items.slice(0, 5);
-        playlist.tracksData = tracks;
-
-        // Fetch the audio features for the tracks
-        const trackIds = tracks.map((trackItem) => trackItem.track.id).join(',');
-        const audioFeaturesResponse = await fetch(`https://api.spotify.com/v1/audio-features?ids=${trackIds}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const audioFeaturesData = await audioFeaturesResponse.json();
-
-        // Evaluate the sentiment based on audio features
-        const sentiment = evaluateSentiment(audioFeaturesData.audio_features);
-        playlist.sentiment = sentiment;
+    
+      try {
+        const playlistResponse = await fetch(`http://localhost:8000/api/spotify/getUserPlaylists?access_token=${accessToken}`);
+        if (!playlistResponse.ok) {
+          throw new Error(`Error fetching user playlists: ${playlistResponse.statusText}`);
+        }
+        const playlistData = await playlistResponse.json();
+        console.log('All Playlists:', playlistData.items);
+    
+        for (const playlist of playlistData.items) {
+          // Fetch the playlist tracks
+          const trackResponse = await fetch(`http://localhost:8000/api/spotify/getPlaylistTracks/${encodeURIComponent(playlist.tracks.href)}?access_token=${accessToken}`);
+          if (!trackResponse.ok) {
+            throw new Error(`Error fetching playlist tracks: ${trackResponse.statusText}`);
+          }
+          const trackData = await trackResponse.json();
+          const tracks = trackData.items.slice(0, 5);
+          playlist.tracksData = tracks;
+    
+          // Fetch the audio features for the tracks
+          const trackIds = tracks.map((trackItem) => trackItem.track.id).join(',');
+          const audioFeaturesResponse = await fetch(`http://localhost:8000/api/spotify/getAudioFeatures/${trackIds}?access_token=${accessToken}`);
+          if (!audioFeaturesResponse.ok) {
+            throw new Error(`Error fetching audio features: ${audioFeaturesResponse.statusText}`);
+          }
+          const audioFeaturesData = await audioFeaturesResponse.json();
+    
+          // Evaluate the sentiment based on audio features
+          const sentiment = evaluateSentiment(audioFeaturesData.audio_features);
+          playlist.mood = sentiment.mood;
+          playlist.genre = sentiment.genre;
+        }
+    
+        setPlaylists([...playlistData.items]);
+    
+        const userProfileResponse = await fetch(`http://localhost:8000/api/spotify/getUserProfile?access_token=${accessToken}`);
+        if (!userProfileResponse.ok) {
+          throw new Error(`Error fetching user profile: ${userProfileResponse.statusText}`);
+        }
+        const userProfileData = await userProfileResponse.json();
+        console.log('User Profile Data:', userProfileData);
+        setDisplayName(userProfileData.display_name);
+      } catch (error) {
+        console.error('Error during data fetching:', error);
+        setError(error.message);
       }
-
-      setPlaylists([...firstFivePlaylists]);
-
-      const userProfileResponse = await fetch('https://api.spotify.com/v1/me', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-
-      const userProfileData = await userProfileResponse.json();
-      setDisplayName(userProfileData.display_name);
-
+    
       setIsLoading(false);
-    };
+    };    
 
     fetchData();
   }, []);

@@ -1,11 +1,12 @@
 import React from 'react';
 
 const Login = () => {
-  const clientId = '7bcd29159d7d4a8990c1048b8c08a19a';
-  const redirectUri = 'http://localhost:3000/callback';
+  
+  const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
+  const redirectUri = process.env.REACT_APP_SPOTIFY_REDIRECT_URI;
+  const authEndpoint = "https://accounts.spotify.com/authorize";
 
   const handleLogin = () => {
-    const authEndpoint = 'https://accounts.spotify.com/authorize';
     const responseType = 'token';
     const scope = 'playlist-read-private';
 
