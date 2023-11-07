@@ -1,3 +1,3 @@
-# 411-project
+# CS411 Final Project
 
-This project will be a spotify playlist AI art generator.
+This project will be a Spotify Playlist AI art generator.
