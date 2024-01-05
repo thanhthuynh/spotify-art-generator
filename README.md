@@ -2,6 +2,7 @@
 
 A web application that integrates your Spotify playlists with dynamic, sentiment-based artwork creation. Utilizing the FERN tech stack (Firebase, Express.js, React, Node.js) and leveraging the Spotify and OpenAI APIs, this app offers a unique experience where each playlist's mood is analyzed and visually represented through custom-generated artwork.
 
+
 ### Key Features:
 Spotify Integration: Connect your Spotify account to access playlists.
 Sentiment Analysis: Uses OpenAI's API to analyze the mood of each playlist.
