@@ -35,3 +35,6 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 ### Acknowledgments
 Spotify API for providing a rich set of music data and audio features
 OpenAI for their state-of-the-art language and image generation models (DALL-E)
+
+### Video Demo
+https://youtu.be/LMNhDAY94AQ?si=EjmSN9z2syx1wTZX
